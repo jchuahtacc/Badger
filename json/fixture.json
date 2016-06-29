@@ -1,0 +1,33 @@
+{
+  "badges" : {
+    "badge_1" : {
+      "name" : "Good Idea!",
+      "url" : "good_idea.jpg",
+      "value" : 400
+    }
+  },
+  "gamedata" : {
+    "uid1" : {
+      "badges" : {
+        "badge_1" : "6/27/2016"
+      },
+      "level" : 2,
+      "medals" : {
+        "bronze" : 2,
+        "gold" : 1,
+        "silver" : 4
+      },
+      "score" : 1000
+    }
+  },
+  "levels" : [ 0, 500, 1000, 2000, 3000, 4000, 6000, 8000, 10000 ],
+  "students" : {
+    "uid1" : {
+      "displayName" : "My Name",
+      "photo" : "url"
+    }
+  },
+  "teachers" : {
+    "mts4A1lnyoX6zVEIGpQbQSTSZ8x1" : "Joon Yee"
+  }
+}
