@@ -33,20 +33,6 @@ function studentClick(event) {
   console.log(uid);
 }
 
-function processStudents() {
-  for (var uid in students.displayNames) {
-    buildStudent(uid);
-    updateName(uid, students.displayNames[uid]);
-    updateThumbnail(uid, students.photos[uid]);
-  }
-}
-
-function processLevels() {
-  for (var uid in levels) {
-    updateLevel(uid, levels[uid]);
-  }
-}
-
 function updateLevel(uid, level) {
   if (!level) {
     level = "";
@@ -76,20 +62,8 @@ function setupHandlers() {
   });
 }
 
-function getGameState() {
-  firebase.database().ref('/students').once('value').then(function(snapshot) {
-    students = snapshot.val();
-    processStudents();
-    firebase.database().ref('/gamedata').child('levels').once('value').then(function(snapshot) {
-      levels = snapshot.val();
-      processLevels();
-    });
-  });
-}
-
 function loggedIn() {
   setupHandlers();
-  getGameState();
 }
 
 function loggedOut() {
