@@ -1,38 +1,45 @@
 var students = { };
-var gamedata = { };
 
-function buildStudent(uid, data) {
+function buildStudent(uid) {
   var div = $("<div></div>");
+  div.click(studentClick);
   div.addClass("text-center");
   div.attr('data-uid', uid);
   div.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
-  var studentData = data;
   div.load("elements.html #studentIcon", function() {
     // build student with data
-    div.find('[data-icon="thumbnail"]').attr('src', data.photo);
-    div.find('[data-icon="name"]').html(data.displayName);
+    firebase.database().ref('/students').child(uid).on('value', function(snapshot) {
+      var data = snapshot.val();
+      div.find('[data-icon="thumbnail"]').attr('src', data.photo);
+      div.find('[data-icon="name"]').html(data.displayName);
+    });
+    firebase.database().ref('/gamedata').child(uid).child('level').on('value', function(snapshot) {
+      if (snapshot.val()) {
+        data = snapshot.val();
+      } else {
+        data = "";
+      }
+      div.find('[data-icon="level"]').text(data);
+    });
   });
   div.appendTo("#students");
 }
 
-function processStudents() {
-  for (var uid in students) {
-    buildStudent(uid, students[uid]);
-  }
+function studentClick(event) {
+  var uid = $(event.currentTarget).attr('data-uid');
+  console.log(uid);
 }
 
-function processGamedata() {
-
+function processStudents() {
+  for (var uid in students) {
+    buildStudent(uid);
+  }
 }
 
 function loggedIn() {
   firebase.database().ref('/students').once('value', function(snapshot) {
     students = snapshot.val();
     processStudents();
-    firebase.database().ref('/gamedata').once('value', function(snapshot) {
-      gamedata = snapshot.val();
-      processGamedata();
-    });
   });
 }
 
@@ -49,5 +56,4 @@ $(document).ready(function() {
       loggedOut();
     }
   });
-  console.log("Hello world");
 });
