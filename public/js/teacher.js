@@ -13,14 +13,6 @@ function buildStudent(uid) {
       div.find('[data-icon="thumbnail"]').attr('src', data.photo);
       div.find('[data-icon="name"]').html(data.displayName);
     });
-    firebase.database().ref('/gamedata').child(uid).child('level').on('value', function(snapshot) {
-      if (snapshot.val()) {
-        data = snapshot.val();
-      } else {
-        data = "";
-      }
-      div.find('[data-icon="level"]').text(data);
-    });
   });
   div.appendTo("#students");
 }
