@@ -5,6 +5,7 @@ function buildStudent(uid, data) {
   var div = $("<div></div>");
   div.addClass("col-md-2 text-center");
   div.attr('data-uid', uid);
+  div.attr('style', "display: inline-block;");
   var studentData = data;
   div.load("elements.html #studentIcon", function() {
     // build student with data
@@ -21,7 +22,7 @@ function processStudents() {
 }
 
 function processGamedata() {
-  
+
 }
 
 function loggedIn() {
