@@ -12,8 +12,23 @@
         "badge_1" : "6/27/2016"
       }
     },
+    "by_uid" : {
+      "uid1" : {
+        "badges" : {
+          "badge_1" : "6/27/2016"
+        },
+        "level" : 2,
+        "medals" : {
+          "bronze" : 2,
+          "gold" : 1,
+          "silver" : 4
+        },
+        "score" : 1000
+      }
+    },
     "levels" : {
-      "uid1" : 1
+      "uid1" : 2,
+      "uid2" : 4
     },
     "medals" : {
       "uid1" : {
