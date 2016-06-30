@@ -1,20 +1,31 @@
 var students = { };
+var levels = { };
+
+var iconTemplate = $("<div></div>");
+
+function buildStudentIconTemplate() {
+  iconTemplate.click(studentClick);
+  iconTemplate.addClass("text-center");
+  iconTemplate.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
+  iconTemplate.load("elements.html #studentIcon");
+}
 
 function buildStudent(uid) {
-  var div = $("<div></div>");
-  div.click(studentClick);
-  div.addClass("text-center");
+  var div = iconTemplate.clone(true);
   div.attr('data-uid', uid);
-  div.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
-  div.load("elements.html #studentIcon", function() {
-    // build student with data
-    firebase.database().ref('/students').child(uid).on('value', function(snapshot) {
-      var data = snapshot.val();
-      div.find('[data-icon="thumbnail"]').attr('src', data.photo);
-      div.find('[data-icon="name"]').html(data.displayName);
-    });
-  });
   div.appendTo("#students");
+}
+
+function getIcon(uid) {
+  return $("#students").find('[data-uid="' + uid + '"]');
+}
+
+function updateName(uid, name) {
+  getIcon(uid).find('[data-icon="name"]').html(name);
+}
+
+function updateThumbnail(uid, photo) {
+  getIcon(uid).find('[data-icon="thumbnail"]').attr('src', photo);
 }
 
 function studentClick(event) {
@@ -23,16 +34,62 @@ function studentClick(event) {
 }
 
 function processStudents() {
-  for (var uid in students) {
+  for (var uid in students.displayNames) {
     buildStudent(uid);
+    updateName(uid, students.displayNames[uid]);
+    updateThumbnail(uid, students.photos[uid]);
   }
 }
 
-function loggedIn() {
-  firebase.database().ref('/students').once('value', function(snapshot) {
+function processLevels() {
+  for (var uid in levels) {
+    updateLevel(uid, levels[uid]);
+  }
+}
+
+function updateLevel(uid, level) {
+  if (!level) {
+    level = "";
+  }
+  getIcon(uid).find('[data-icon="level"]').html(level);
+}
+
+function setupHandlers() {
+  firebase.database().ref('/gamedata').child('levels').on('child_changed', function(snapshot, prevKey) {
+    updateLevel(snapshot.key, snapshot.val());
+  });
+  firebase.database().ref('/gamedata').child('levels').on('child_added', function(snapshot, prevKey) {
+    updateLevel(snapshot.key, snapshot.val());
+  });
+  firebase.database().ref('/students').child('displayNames').on('child_changed', function(snapshot, prevKey) {
+    updateName(snapshot.key, snapshot.val());
+  });
+  firebase.database().ref('/students').child('displayNames').on('child_added', function(snapshot, prevKey) {
+    buildStudent(snapshot.key);
+    updateName(snapshot.key, snapshot.val());
+  });
+  firebase.database().ref('/students').child('photos').on('child_changed', function(snapshot, prevKey) {
+    updateThumbnail(snapshot.key, snapshot.val());
+  });
+  firebase.database().ref('/students').child('photos').on('child_added', function(snapshot, prevKey) {
+    updateThumbnail(snapshot.key, snapshot.val());
+  });
+}
+
+function getGameState() {
+  firebase.database().ref('/students').once('value').then(function(snapshot) {
     students = snapshot.val();
     processStudents();
+    firebase.database().ref('/gamedata').child('levels').once('value').then(function(snapshot) {
+      levels = snapshot.val();
+      processLevels();
+    });
   });
+}
+
+function loggedIn() {
+  setupHandlers();
+  getGameState();
 }
 
 function loggedOut() {
@@ -40,6 +97,7 @@ function loggedOut() {
 }
 
 $(document).ready(function() {
+  buildStudentIconTemplate();
   firebase.auth().onAuthStateChanged(function(user) {
     // Event when a Firebase user authenticates or signs out
     if (user) {
