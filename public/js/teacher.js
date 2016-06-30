@@ -3,9 +3,9 @@ var gamedata = { };
 
 function buildStudent(uid, data) {
   var div = $("<div></div>");
-  div.addClass("col-md-2 text-center");
+  div.addClass("text-center");
   div.attr('data-uid', uid);
-  div.attr('style', "display: inline-block;");
+  div.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
   var studentData = data;
   div.load("elements.html #studentIcon", function() {
     // build student with data
