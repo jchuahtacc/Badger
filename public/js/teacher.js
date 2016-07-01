@@ -19,18 +19,47 @@ var defaultGameData = {
   xp : 0
 };
 
+var badges = { };
+
 var iconTemplate = $("<div></div>");
+var badgeTemplate = $("<div></div>");
 
 function today() {
   var d = new Date();
   return (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getYear() - 100 + 2000);
 }
 
+function buildBadgeTemplate() {
+  badgeTemplate.addClass("text-center");
+  badgeTemplate.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
+  badgeTemplate.load("./elements/badge.html", function() {
+    badgeTemplate.find('[data-badge="award"]').click(awardBadge);
+    loadBadges();
+  });
+}
+
+function awardBadge(event) {
+
+}
+
+function buildBadge(badge_id, data) {
+  if ($("[data-badge-id=' + badge_id ']").length) {
+    // badge exists, do nothing?
+  } else {
+    var div = badgeTemplate.clone(true);
+    div.attr('data-badge-id', badge_id);
+    div.find('[data-badge="thumbnail"]').attr('src', data.url);
+    div.find('[data-badge="xp"]').html(data.value);
+    div.find('[data-badge="name"]').html(data.name);
+    div.appendTo("#badgeCollection");
+  }
+}
+
 function buildStudentIconTemplate() {
   iconTemplate.click(studentClick);
   iconTemplate.addClass("text-center");
   iconTemplate.attr('style', "display: inline-block; width: 30%; vertical-align: text-top; margin: 1% 1% 1% 1%;");
-  iconTemplate.load("elements.html #studentIcon");
+  iconTemplate.load("./elements/studenticon.html");
 }
 
 function buildStudent(uid) {
@@ -84,6 +113,18 @@ function studentClick(event) {
     $("#studentModal").find("#progressBar").attr('aria-valuenow', data.xp);
     $("#studentModal").find("#progressBar").attr('aria-valuenow', data.xp);
     $("#studentModal").find("#progressBar").attr('style', 'width: ' + progressPercent + '%;');
+    $("[data-badge='award']").removeClass("disabled");
+    if (data.badges) {
+      for (badge_id in data.badges) {
+        if ($("[data-badge-id='" + badge_id + "']").length) {
+          var button = $("[data-badge-id='" + badge_id + "']").find('[data-badge="award"]');
+          if (button.length) {
+            $(button).html(data.badges[badge_id]);
+            $(button).addClass("disabled");
+          }
+        }
+      }
+    }
     $("#studentModal").modal("show");
   });
 }
@@ -134,6 +175,21 @@ function setupHandlers() {
   });
 }
 
+function loadBadges() {
+  firebase.database().ref('/badges').once('value').then(function(snapshot) {
+    badges = snapshot.val();
+    for (var badge_id in badges) {
+      buildBadge(badge_id, badges[badge_id]);
+    }
+    firebase.database().ref('/badges').on('child_added', function(snapshot) {
+      if (!(snapshot.key in badges)) {
+        badges[snapshot.key] = snapshot.val();
+        buildBadge(snapshot.key, snapshot.val());
+      }
+    });
+  });
+}
+
 function loggedIn() {
   setupHandlers();
 }
@@ -143,8 +199,9 @@ function loggedOut() {
 }
 
 $(document).ready(function() {
+  buildBadgeTemplate();
   buildStudentIconTemplate();
-  $('[data-icon="studentView"]').load("elements.html #studentView");
+  $('[data-icon="studentView"]').load("./elements/studentview.html");
   firebase.auth().onAuthStateChanged(function(user) {
     // Event when a Firebase user authenticates or signs out
     if (user) {
