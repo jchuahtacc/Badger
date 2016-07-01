@@ -5,8 +5,26 @@ var students = {
 var gamedata = {
   levels : { },
 };
+var xpladder = [ ];
+var defaultGameData = {
+  badges : {
+    badge_1: today()
+  },
+  level : 1,
+  medals: {
+    bronze : 0,
+    gold : 0,
+    silver : 0,
+  },
+  xp : 0
+};
 
 var iconTemplate = $("<div></div>");
+
+function today() {
+  var d = new Date();
+  return (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getYear() - 100 + 2000);
+}
 
 function buildStudentIconTemplate() {
   iconTemplate.click(studentClick);
@@ -37,13 +55,41 @@ function updateThumbnail(uid, photo) {
 
 function studentClick(event) {
   var uid = $(event.currentTarget).attr('data-uid');
-  $("#badge").find('[data-icon="level"]').html(gamedata.levels[uid]);
-  $("#badge").find('[data-icon="name"]').html(students.displayNames[uid]);
-  $("#badge").find('[data-icon="thumbnail"]').attr('src', students.photos[uid]);
+  $("#studentModal").find('[data-icon="level"]').html(gamedata.levels[uid]);
+  $("#studentModal").find('[data-icon="name"]').html(students.displayNames[uid]);
+  $("#studentModal").find('[data-icon="thumbnail"]').attr('src', students.photos[uid]);
   firebase.database().ref('/gamedata').child('by_uid').child(uid).once('value').then(function(snapshot) {
+    var data = defaultGameData;
+    if (snapshot.val()) {
+      data = snapshot.val();
+    } else {
+      // couldn't find record. write default info
+      writeDefaultGamedata(uid);
+    }
+    var currentLvlXp = xpladder[data.level - 1];
+    var nextLvlXp = xpladder[data.level];
+    var progressPercent = (data.xp - currentLvlXp) * 100.0 / (nextLvlXp - currentLvlXp);
 
-    $("#badge").modal("show");
+    $("#studentModal").find("#goldbadge").html(data.medals.gold);
+    $("#studentModal").find("#silverbadge").html(data.medals.silver);
+    $("#studentModal").find("#bronzebadge").html(data.medals.bronze);
+    $("#studentModal").find("#currentLevel").html(data.level);
+    $("#studentModal").find("#nextLevel").html(data.level + 1);
+    $("#studentModal").find("#progressBar").attr('aria-valuemin', currentLvlXp);
+    $("#studentModal").find("#progressBar").attr('aria-valuemax', nextLvlXp);
+    $("#studentModal").find("#progressBar").attr('aria-valuenow', data.xp);
+    $("#studentModal").find("#progressBar").attr('aria-valuenow', data.xp);
+    $("#studentModal").find("#progressBar").attr('style', 'width: ' + progressPercent + '%;');
+    $("#studentModal").modal("show");
   });
+}
+
+function writeDefaultGamedata(uid) {
+  firebase.database().ref('/gamedata').child('by_uid').child(uid).set(defaultGameData);
+  firebase.database().ref('/gamedata').child('badges').child(uid).set(defaultGameData.badges);
+  firebase.database().ref('/gamedata').child('levels').child(uid).set(defaultGameData.level);
+  firebase.database().ref('/gamedata').child('xp').child(uid).set(defaultGameData.xp);
+  firebase.database().ref('/gamedata').child('medals').child(uid).set(defaultGameData.medals);
 }
 
 function updateLevel(uid, level) {
@@ -55,6 +101,9 @@ function updateLevel(uid, level) {
 }
 
 function setupHandlers() {
+  firebase.database().ref('xpladder').once('value', function(snapshot) {
+    xpladder = snapshot.val();
+  });
   firebase.database().ref('/gamedata').child('levels').on('child_changed', function(snapshot, prevKey) {
     updateLevel(snapshot.key, snapshot.val());
   });

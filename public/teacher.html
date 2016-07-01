@@ -8,15 +8,14 @@
     <script src="./js/common.js"></script>
     <script src="./js/teacher.js"></script>
     <link href="./css/site.css" rel="stylesheet" type="text/css">
-  </head>
-  <body>
+  </head><body>
     <div class="cover" id="cover">
       <div class="cover-image" style="background-image: url(https://unsplash.imgix.net/photo-1418065460487-3e41a6c84dc5?q=25&amp;fm=jpg&amp;s=127f3a3ccf4356b7f79594e05f6c840e);"></div>
       <div class="container">
         <div class="row">
           <div class="col-md-12 text-center">
             <h1>Badger</h1>
-            <p class="text-inverse">Get badges.</p>
+            <p class="text-inverse">Badger People.</p>
             <br>
             <br>
             <a class="btn btn-lg btn-primary" onclick="login();">Login</a>
@@ -48,7 +47,18 @@
           <div class="col-md-4 text-center" style="margin-bottom: 3em;">
             <a class="btn btn-lg btn-primary" id="random">Randomly Pick a Student</a>
           </div>
-          <div class="col-md-8 text-center" id="students">
+          <div class="col-md-8 text-center" id="students"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="studentModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title">Badger Someone</h4>
+          </div>
+          <div class="modal-body" data-icon="studentView">
           </div>
         </div>
       </div>
