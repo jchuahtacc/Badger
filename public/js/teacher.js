@@ -34,9 +34,13 @@ function buildStudentIconTemplate() {
 }
 
 function buildStudent(uid) {
-  var div = iconTemplate.clone(true);
-  div.attr('data-uid', uid);
-  div.appendTo("#students");
+  if ($("[data-uid='" + uid + "']").length) {
+    // element exists already. do nothing?
+  } else {
+    var div = iconTemplate.clone(true);
+    div.attr('data-uid', uid);
+    div.appendTo("#students");
+  }
 }
 
 function getIcon(uid) {
