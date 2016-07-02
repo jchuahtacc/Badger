@@ -7,24 +7,49 @@
     }
   },
   "gamedata" : {
-    "uid1" : {
-      "badges" : {
+    "badges" : {
+      "uid1" : {
         "badge_1" : "6/27/2016"
-      },
-      "level" : 2,
-      "medals" : {
+      }
+    },
+    "by_uid" : {
+      "uid1" : {
+        "badges" : {
+          "badge_1" : "6/27/2016"
+        },
+        "level" : 2,
+        "medals" : {
+          "bronze" : 2,
+          "gold" : 1,
+          "silver" : 4
+        },
+        "score" : 1000
+      }
+    },
+    "levels" : {
+      "uid1" : 2,
+      "uid2" : 4
+    },
+    "medals" : {
+      "uid1" : {
         "bronze" : 2,
         "gold" : 1,
         "silver" : 4
-      },
-      "score" : 1000
+      }
+    },
+    "scores" : {
+      "uid1" : 1000
     }
   },
   "levels" : [ 0, 500, 1000, 2000, 3000, 4000, 6000, 8000, 10000 ],
   "students" : {
-    "uid1" : {
-      "displayName" : "My Name",
-      "photo" : "url"
+    "displayNames" : {
+      "uid1" : "Name 1",
+      "uid2" : "Name 2"
+    },
+    "photos" : {
+      "uid1" : "https://placehold.it/150x150",
+      "uid2" : "https://placehold.it/150x150"
     }
   },
   "teachers" : {
