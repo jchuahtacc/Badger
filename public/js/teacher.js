@@ -20,9 +20,12 @@ var defaultGameData = {
 };
 
 var badges = { };
+var medals = { bronze : 100, silver : 200, gold : 400 };
 
 var iconTemplate = $("<div></div>");
 var badgeTemplate = $("<div></div>");
+
+var current_data;
 
 var current_uid;
 var current_xp;
@@ -43,6 +46,15 @@ function buildBadgeTemplate() {
   });
 }
 
+function awardMedal(medal) {
+  var xp = medals[medal];
+  current_data.medals[medal]++;
+  firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('medals').child(medal).set(current_data.medals[medal]);
+  $.bootstrapGrowl("Awarded " + medal + " medal (" + medals[medal] + ")");
+  $("#studentModal").modal("hide");
+  addXP(medals[medal]);
+}
+
 function awardBadge(event) {
   var badge_id = $(event.currentTarget).attr('data-badge-id');
   var xp = badges[badge_id].value;
@@ -57,9 +69,9 @@ function addXP(xp) {
   var newXP = current_xp + xp;
   firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('xp').set(newXP);
   firebase.database().ref('/gamedata').child('xp').child(current_uid).set(newXP);
-  if (newXP > xpladder[current_level]) {
+  if (newXP >= xpladder[current_level]) {
     current_level++;
-    $.bootstrapGrowl(current_displayName + " reached level " + current_level, { type: 'success' });
+    $.bootstrapGrowl(current_displayName + " reached level " + current_level + "!", { type: 'success' });
     firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('level').set(current_level);
     firebase.database().ref('/gamedata').child('levels').child(current_uid).set(current_level);
   }
@@ -123,6 +135,7 @@ function studentClick(event) {
       // couldn't find record. write default info
       writeDefaultGamedata(uid);
     }
+    current_data = data;
     current_xp = data.xp;
     current_level = data.level;
     current_displayName = students.displayNames[uid];
