@@ -121,9 +121,11 @@ function updateThumbnail(uid, photo) {
   students.photos[uid] = photo;
   getIcon(uid).find('[data-icon="thumbnail"]').attr('src', photo);
 }
-
 function studentClick(event) {
   var uid = $(event.currentTarget).attr('data-uid');
+  viewStudent(uid);
+}
+function viewStudent(uid) {
   $("#studentModal").find('[data-icon="level"]').html(gamedata.levels[uid]);
   $("#studentModal").find('[data-icon="name"]').html(students.displayNames[uid]);
   $("#studentModal").find('[data-icon="thumbnail"]').attr('src', students.photos[uid]);
@@ -229,6 +231,20 @@ function loadBadges() {
       }
     });
   });
+}
+
+function pickRandom() {
+  var pairs = [];
+  for (var uid in gamedata.levels) {
+    pairs.push({ uid : uid, level : gamedata.levels[uid] })
+  }
+  pairs.sort(function(a, b) {
+    return a.level - b.level;
+  });
+  var max = Math.floor((pairs.length - 1) / 2);
+  var min = 0;
+  var selection = Math.floor(Math.random() * (max - min + 1)) + min;
+  viewStudent(pairs[selection].uid);
 }
 
 function loggedIn() {
