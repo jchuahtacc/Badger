@@ -247,10 +247,18 @@ function pickRandom() {
   viewStudent(pairs[selection].uid);
 }
 
+function checkTeacher() {
+  firebase.database().ref('/teachers').child(firebase.auth().currentUser.uid).once('value', function(snapshot) {
+    if (snapshot.val()) {
+      setupHandlers();
+      $("#cover").hide();
+      $("#teacherInterface").show();
+    }
+  });
+}
+
 function loggedIn() {
-  setupHandlers();
-  $("#cover").hide();
-  $("#teacherInterface").show();
+  checkTeacher();
 }
 
 function loggedOut() {
