@@ -24,6 +24,10 @@ var badges = { };
 var iconTemplate = $("<div></div>");
 var badgeTemplate = $("<div></div>");
 
+var current_uid;
+var current_xp;
+var current_level;
+
 function today() {
   var d = new Date();
   return (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getYear() - 100 + 2000);
@@ -39,7 +43,23 @@ function buildBadgeTemplate() {
 }
 
 function awardBadge(event) {
+  var badge_id = $(event.currentTarget).attr('data-badge-id');
+  var xp = badges[badge_id].value;
+  firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('badges').child(badge_id).set(today());
+  firebase.database().ref('/gamedata').child('badges').child(current_uid).child(badge_id).set(today());
+  $("#studentModal").modal("hide");
+  addXP(xp);
+}
 
+function addXP(xp) {
+  var newXP = current_xp + xp;
+  firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('xp').set(newXP);
+  firebase.database().ref('/gamedata').child('xp').child(current_uid).set(newXP);
+  if (newXP > xpladder[current_level]) {
+    current_level++;
+    firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('level').set(current_level);
+    firebase.database().ref('/gamedata').child('levels').child(current_uid).set(current_level);
+  }
 }
 
 function buildBadge(badge_id, data) {
@@ -51,6 +71,7 @@ function buildBadge(badge_id, data) {
     div.find('[data-badge="thumbnail"]').attr('src', data.url);
     div.find('[data-badge="xp"]').html(data.value);
     div.find('[data-badge="name"]').html(data.name);
+    div.find('[data-badge="award"]').removeClass("disabled").attr('data-badge-id', badge_id);
     div.appendTo("#badgeCollection");
   }
 }
@@ -99,6 +120,8 @@ function studentClick(event) {
       // couldn't find record. write default info
       writeDefaultGamedata(uid);
     }
+    current_xp = data.xp;
+    current_level = data.level;
     var currentLvlXp = xpladder[data.level - 1];
     var nextLvlXp = xpladder[data.level];
     var progressPercent = (data.xp - currentLvlXp) * 100.0 / (nextLvlXp - currentLvlXp);
@@ -125,6 +148,7 @@ function studentClick(event) {
         }
       }
     }
+    current_uid = uid;
     $("#studentModal").modal("show");
   });
 }
