@@ -233,10 +233,14 @@ function loadBadges() {
 
 function loggedIn() {
   setupHandlers();
+  $("#cover").hide();
+  $("#teacherInterface").show();
 }
 
 function loggedOut() {
   // clean up screen
+  $("#cover").show();
+  $("#teacherInterface").hide();
 }
 
 $(document).ready(function() {

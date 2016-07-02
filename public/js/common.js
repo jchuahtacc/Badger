@@ -28,3 +28,9 @@ function login() {
     console.log("error", error);
   });
 }
+
+function logout() {
+  firebase.auth().signOut().then(function() {
+    $.bootstrapGrowl("Signed out");
+  });
+}
