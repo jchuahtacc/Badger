@@ -27,6 +27,7 @@ var badgeTemplate = $("<div></div>");
 var current_uid;
 var current_xp;
 var current_level;
+var current_displayName;
 
 function today() {
   var d = new Date();
@@ -48,6 +49,7 @@ function awardBadge(event) {
   firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('badges').child(badge_id).set(today());
   firebase.database().ref('/gamedata').child('badges').child(current_uid).child(badge_id).set(today());
   $("#studentModal").modal("hide");
+  $.bootstrapGrowl("Awarded badge: " + badges[badge_id].name + "(" + badges[badge_id].value + " xp)");
   addXP(xp);
 }
 
@@ -57,6 +59,7 @@ function addXP(xp) {
   firebase.database().ref('/gamedata').child('xp').child(current_uid).set(newXP);
   if (newXP > xpladder[current_level]) {
     current_level++;
+    $.bootstrapGrowl(current_displayName + " reached level " + current_level);    
     firebase.database().ref('/gamedata').child('by_uid').child(current_uid).child('level').set(current_level);
     firebase.database().ref('/gamedata').child('levels').child(current_uid).set(current_level);
   }
@@ -122,6 +125,7 @@ function studentClick(event) {
     }
     current_xp = data.xp;
     current_level = data.level;
+    current_displayName = students.displayNames[uid];
     var currentLvlXp = xpladder[data.level - 1];
     var nextLvlXp = xpladder[data.level];
     var progressPercent = (data.xp - currentLvlXp) * 100.0 / (nextLvlXp - currentLvlXp);
